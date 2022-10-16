@@ -1,7 +1,4 @@
-#include <iostream>
-#include <tuple>
 #include "number.hpp"
-#include <cmath>
 
 int main() {
 

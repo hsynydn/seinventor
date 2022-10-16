@@ -1,19 +1,20 @@
 #ifndef SEINVERTOR_NUMBER_HPP
 #define SEINVERTOR_NUMBER_HPP
 
-#include <array>
-#include <tuple>
 #include <string>
+#include <array>
 #include <utility>
 #include <memory>
 #include <vector>
-#include <regex>
 #include <iostream>
+#include <tuple>
+#include <regex>
 
-namespace seinventor{
+namespace {
 
     typedef std::tuple<int, int> range;
     typedef std::tuple<uint64_t, uint64_t> range_l;
+
     constexpr int kRangeMin {0};
     constexpr int kRangeMax {1};
     constexpr int kExceptionMax {128};
@@ -34,6 +35,36 @@ namespace seinventor{
     public:
         static constexpr std::array<range_l, 1> kNumberRange {range_l{INTMAX_MIN, INTMAX_MAX}};
     };
+
+    template<typename T, typename K>
+    class Policy {
+    public:
+        virtual bool validate(const T &) const = 0;
+    };
+
+    template <typename Base>
+    class FormattingPolicy : public Policy<std::string, Base>{
+    public:
+        static FormattingPolicy& getInstance(){
+            static FormattingPolicy<Base> instance;
+            return instance;
+        }
+
+        [[nodiscard]] bool validate(const std::string& input) const override {
+            if (std::regex_match(input, Base::mFormat)){
+                return true;
+            }
+            return false;
+        }
+
+    private:
+        FormattingPolicy() = default;
+        FormattingPolicy(FormattingPolicy&) = default;
+        FormattingPolicy(FormattingPolicy&&)  noexcept = default;
+    };
+}
+
+namespace seinventor{
 
     class base10{
     public:
@@ -67,33 +98,6 @@ namespace seinventor{
         };
     }
 
-    template <typename T, typename K>
-    class Policy{
-    public:
-        virtual bool validate(const T&) const = 0;
-    };
-
-    template <typename Base>
-    class FormattingPolicy : public Policy<std::string, Base>{
-    public:
-        static FormattingPolicy& getInstance(){
-            static FormattingPolicy<Base> instance;
-            return instance;
-        }
-
-        [[nodiscard]] bool validate(const std::string& input) const override {
-            if (std::regex_match(input, Base::mFormat)){
-                return true;
-            }
-            return false;
-        }
-
-    private:
-        FormattingPolicy() = default;
-        FormattingPolicy(FormattingPolicy&) = default;
-        FormattingPolicy(FormattingPolicy&&)  noexcept = default;
-    };
-
     template <typename Base>
     class number{
     public:
@@ -112,6 +116,7 @@ namespace seinventor{
         std::string mData;
         uint64_t mNum;
     };
+
 }
 
 #endif // SEINVERTOR_NUMBER_HPP
