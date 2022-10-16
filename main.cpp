@@ -1,23 +1,14 @@
 #include <iostream>
 #include <tuple>
-#include "base.hpp"
+#include "number.hpp"
+#include <cmath>
 
 int main() {
 
-
-
-    std::tuple<int64_t, int64_t> a{-9223372036854775808, -9223372036854775808};
-
-    std::cout << INTMAX_MIN << std::endl;
-
-
-//    try{
-//        seinventor::number<seinventor::base10> number5 {"020110011"};
-//    }catch (seinventor::exception::AllowableDigitPolicy& e){
-//        std::cout << e.what() << std::endl;
-//    }
-
-
+    seinventor::number<seinventor::base10> number1 {"1010"};
+    seinventor::number<seinventor::base2> number2 {"0b01010101010101010"};
+    seinventor::number<seinventor::base16> number3 {"0x0F"};
+    seinventor::number<seinventor::base16> aNumber {"0x161616FF161616FF"};
 
     return 0;
 }

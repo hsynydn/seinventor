@@ -1,5 +1,5 @@
-#ifndef SEINVERTOR_BASE_HPP
-#define SEINVERTOR_BASE_HPP
+#ifndef SEINVERTOR_NUMBER_HPP
+#define SEINVERTOR_NUMBER_HPP
 
 #include <array>
 #include <tuple>
@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <regex>
+#include <iostream>
 
 namespace seinventor{
 
@@ -36,18 +37,21 @@ namespace seinventor{
 
     class base10{
     public:
+        static constexpr int mBase {10};
         static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_9}};
     };
 
     class base2{
     public:
+        static constexpr int mBase {2};
         static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_1}};
     };
 
     class base16{
     public:
+        static constexpr int mBase {16};
         static std::regex mFormat;
         static constexpr std::array<range, 3> kDigitRange {range{kChar_0, kChar_9}, range{kChar_A, kChar_F}, range{kChar_a, kChar_f}};
     };
@@ -96,21 +100,18 @@ namespace seinventor{
 
         static constexpr int kMaxBuffer = 64;
 
-        explicit number(const std::string& data){
-            if (!FormattingPolicy<Base>::getInstance().validate(data)){
+        explicit number(std::string  data) : mData(std::move(data)){
+            if (!FormattingPolicy<Base>::getInstance().validate(mData)){
                 throw seinventor::exception::InputFormatException();
             }
+
+            mNum = std::stoll(mData, 0, Base::mBase);
         };
 
-        template<typename T>
-        number<T>& convert(){
-
-        }
-
     private:
-        std::array<uint8_t, kMaxBuffer> buffer;
+        std::string mData;
+        uint64_t mNum;
     };
-
 }
 
-#endif // SEINVERTOR_BASE_HPP
+#endif // SEINVERTOR_NUMBER_HPP
