@@ -109,8 +109,12 @@ namespace seinventor{
                 throw seinventor::exception::InputFormatException();
             }
 
-            mNum = std::stoll(mData, 0, Base::mBase);
+            mNum = std::strtoull(mData.c_str(), 0, Base::mBase);
         };
+
+        uint64_t getNumber(){
+            return mNum;
+        }
 
     private:
         std::string mData;
