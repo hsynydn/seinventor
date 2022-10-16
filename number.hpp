@@ -68,6 +68,7 @@ namespace seinventor{
 
     class base10{
     public:
+        static constexpr int mIndex {0};
         static constexpr int mBase {10};
         static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_9}};
@@ -75,6 +76,7 @@ namespace seinventor{
 
     class base2{
     public:
+        static constexpr int mIndex {2};
         static constexpr int mBase {2};
         static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_1}};
@@ -82,6 +84,7 @@ namespace seinventor{
 
     class base16{
     public:
+        static constexpr int mIndex {0};
         static constexpr int mBase {16};
         static std::regex mFormat;
         static constexpr std::array<range, 3> kDigitRange {range{kChar_0, kChar_9}, range{kChar_A, kChar_F}, range{kChar_a, kChar_f}};
@@ -109,7 +112,7 @@ namespace seinventor{
                 throw seinventor::exception::InputFormatException();
             }
 
-            mNum = std::strtoull(mData.c_str(), 0, Base::mBase);
+            mNum = std::strtoull(mData.c_str() + Base::mIndex, 0, Base::mBase);
         };
 
         uint64_t getNumber(){
