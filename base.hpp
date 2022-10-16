@@ -7,6 +7,7 @@
 #include <utility>
 #include <memory>
 #include <vector>
+#include <regex>
 
 namespace seinventor{
 
@@ -35,61 +36,58 @@ namespace seinventor{
 
     class base10{
     public:
+        static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_9}};
     };
 
     class base2{
     public:
+        static std::regex mFormat;
         static constexpr std::array<range, 1> kDigitRange {range{kChar_0, kChar_1}};
     };
 
     class base16{
     public:
+        static std::regex mFormat;
         static constexpr std::array<range, 3> kDigitRange {range{kChar_0, kChar_9}, range{kChar_A, kChar_F}, range{kChar_a, kChar_f}};
     };
 
     namespace exception{
-        class AllowableDigitPolicy : std::exception{
+        class InputFormatException : std::exception{
         public:
             [[nodiscard]] const char* what() const noexcept override {
                 return msg_;
             }
         private:
-            static constexpr char msg_ [kExceptionMax]  {"Violation of Allowable Digit Policy"};
+            static constexpr char msg_ [kExceptionMax]  {"Violation of Input Format"};
         };
     }
 
     template <typename T, typename K>
-    class ConversionPolicy{
+    class Policy{
     public:
         virtual bool validate(const T&) const = 0;
     };
 
     template <typename Base>
-    class AllowableDigitPolicy : public ConversionPolicy<uint8_t, Base>{
+    class FormattingPolicy : public Policy<std::string, Base>{
     public:
-        static AllowableDigitPolicy& getInstance(){
-            static AllowableDigitPolicy<Base> instance;
+        static FormattingPolicy& getInstance(){
+            static FormattingPolicy<Base> instance;
             return instance;
         }
 
-        [[nodiscard]] bool validate(const uint8_t& digit) const override {
-            for (auto range: Base::kDigitRange) {
-                if (digit <= std::get<kRangeMax>(range) && digit >= std::get<kRangeMin>(range)) {
-                    return true;
-                }
+        [[nodiscard]] bool validate(const std::string& input) const override {
+            if (std::regex_match(input, Base::mFormat)){
+                return true;
             }
             return false;
         }
 
     private:
-        AllowableDigitPolicy() = default;
-        AllowableDigitPolicy(AllowableDigitPolicy&) = default;
-        AllowableDigitPolicy(AllowableDigitPolicy&&)  noexcept = default;
-    };
-
-    class Convertable{
-    public:
+        FormattingPolicy() = default;
+        FormattingPolicy(FormattingPolicy&) = default;
+        FormattingPolicy(FormattingPolicy&&)  noexcept = default;
     };
 
     template <typename Base>
@@ -98,13 +96,17 @@ namespace seinventor{
 
         static constexpr int kMaxBuffer = 64;
 
-        explicit number(std::string data){
-            for (auto c : data) {
-                if (!AllowableDigitPolicy<Base>::getInstance().validate(c)){
-                    throw seinventor::exception::AllowableDigitPolicy();
-                }
+        explicit number(const std::string& data){
+            if (!FormattingPolicy<Base>::getInstance().validate(data)){
+                throw seinventor::exception::InputFormatException();
             }
         };
+
+        template<typename T>
+        number<T>& convert(){
+
+        }
+
     private:
         std::array<uint8_t, kMaxBuffer> buffer;
     };
